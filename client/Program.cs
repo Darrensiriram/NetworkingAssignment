@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.Json;
 using UDP_FTP.Models;
 using UDP_FTP.Error_Handling;
 using static UDP_FTP.Models.Enums;
@@ -15,12 +14,12 @@ namespace Client
         {
             string student_1 = "Darren Siriram 0999506";
             // string student_2 = ;
-
-
+            
             byte[] buffer = new byte[1000];
             byte[] msg = new byte[100];
-            Socket sock;
             // TODO: Initialise the socket/s as needed from the description of the assignment
+            Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            IPAddress broadcast = IPAddress.Parse("127.0.0.1");
 
             HelloMSG h = new HelloMSG();
             RequestMSG r = new RequestMSG();
@@ -30,16 +29,25 @@ namespace Client
 
             try
             {
+                
+                //sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                //IPAddress broadcast = IPAddress.Parse("127.0.0.1");
+                
+                //Console.WriteLine($"[Client] send: {h.From}");
+                //IPEndPoint ep = new IPEndPoint(broadcast, clientPort);
+
                 // TODO: Instantiate and initialize your socket 
-
-
+                IPEndPoint endpoint = new IPEndPoint(broadcast, 5004);
                 // TODO: Send hello mesg
-
+                byte[] sendbuf = Encoding.ASCII.GetBytes("cap");
+                //byte[] test = Encoding.ASCII.GetBytes("Hello");
+                sock.SendTo(sendbuf, endpoint);
+                
                 // TODO: Receive and verify a HelloMSG 
 
 
                 // TODO: Send the RequestMSG message requesting to download a file name
-
+                
                 // TODO: Receive a RequestMSG from remoteEndpoint
                 // receive the message and verify if there are no errors
 
@@ -54,7 +62,7 @@ namespace Client
                 // receive the message and verify if there are no errors
 
                 // TODO: confirm close message
-
+                Console.WriteLine("Message sent to broadcast address");
             }
             catch
             {

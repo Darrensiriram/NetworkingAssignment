@@ -28,19 +28,22 @@ namespace UDP_FTP.File_Handler
         public Communicate()
         {
             // TODO: Initializes another instance of the IPEndPoint for the remote host
-
+            remoteEndpoint = new IPEndPoint(IPAddress.Any, 5004);
 
             // TODO: Specify the buffer size
-
-
+            buffer = new byte[1000];
+            msg = new byte[1024];
+            
             // TODO: Get a random SessionID
-
-
+            Random id = new Random();
+            SessionID = id.Next(1, 400);
+            
             // TODO: Create local IPEndpoints and a Socket to listen 
-            //       Keep using port numbers and protocols mention in the assignment description
-            //       Associate a socket to the IPEndpoints to start the communication
-
-
+            remoteEP = new IPEndPoint(IPAddress.Any, 5004);
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            
+            
+            
         }
 
         public ErrorType StartDownload()
@@ -54,14 +57,19 @@ namespace UDP_FTP.File_Handler
             AckMSG ack = new AckMSG();
             CloseMSG cls = new CloseMSG();
 
-
+            GreetBack.From = Server;
+            GreetBack.To = Client;
+            GreetBack.ConID = SessionID;
+            GreetBack.Type = Messages.HELLO_REPLY;
+                
             // TODO: Start the communication by receiving a HelloMSG message
+            Console.WriteLine("Message received from: {0}", remoteEP);
+            int recv = socket.ReceiveFrom(msg, SocketFlags.None, ref remoteEP);
+            Console.WriteLine(Encoding.ASCII.GetString(msg,0,recv));
             // Receive and deserialize HelloMSG message 
             // Verify if there are no errors
             // Type must match one of the ConSettings' types and receiver address must be the server address
-
-
-
+            
             // TODO: If no error is found then HelloMSG will be sent back
 
 
@@ -114,7 +122,7 @@ namespace UDP_FTP.File_Handler
             // Receive the message and verify if there are no errors
 
 
-            Console.WriteLine("Group members: {0} | {1}", student_1, student_2);
+            //Console.WriteLine("Group members: {0} | {1}", student_1, student_2);
             return ErrorType.NOERROR;
         }
     }
