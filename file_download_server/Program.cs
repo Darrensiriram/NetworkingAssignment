@@ -19,7 +19,7 @@ namespace UDP_FTP
             Communicate FileShare = new Communicate();
             Console.WriteLine("The file download request terminated with code {0}.", FileShare.StartDownload());
 
-            Console.WriteLine("Group members: {0} | {1}", student_1, student_2);
+            Console.WriteLine("Group members: {0}  {1}", student_1, student_2);
         }
     }
 }

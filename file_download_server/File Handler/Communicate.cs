@@ -27,23 +27,19 @@ namespace UDP_FTP.File_Handler
 
         public Communicate()
         {
-            // TODO: Initializes another instance of the IPEndPoint for the remote host
-            remoteEndpoint = new IPEndPoint(IPAddress.Any, 5004);
-
-            // TODO: Specify the buffer size
+        
+            IPAddress broadcast = IPAddress.Parse("127.0.0.1");
+            remoteEndpoint = new IPEndPoint(broadcast, 5004);
+        
             buffer = new byte[1000];
             msg = new byte[1024];
-            
-            // TODO: Get a random SessionID
+        
             Random id = new Random();
             SessionID = id.Next(1, 400);
-            
-            // TODO: Create local IPEndpoints and a Socket to listen 
-            remoteEP = new IPEndPoint(IPAddress.Any, 5004);
+        
+            remoteEP = new IPEndPoint(broadcast, 5004);
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            
-            
-            
+            socket.Bind(remoteEndpoint);
         }
 
         public ErrorType StartDownload()
@@ -61,6 +57,11 @@ namespace UDP_FTP.File_Handler
             GreetBack.To = Client;
             GreetBack.ConID = SessionID;
             GreetBack.Type = Messages.HELLO_REPLY;
+
+            req.From = Server;
+            req.To = Client;
+            req.Type = Messages.REQUEST;
+            
                 
             // TODO: Start the communication by receiving a HelloMSG message
             Console.WriteLine("Message received from: {0}", remoteEP);
@@ -71,7 +72,8 @@ namespace UDP_FTP.File_Handler
             // Type must match one of the ConSettings' types and receiver address must be the server address
             
             // TODO: If no error is found then HelloMSG will be sent back
-
+            msg = Encoding.ASCII.GetBytes(Messages.HELLO_REPLY.ToString());
+            socket.SendTo(msg, remoteEP);
 
             // TODO: Receive the next message
             // Expected message is a download RequestMSG message containing the file name

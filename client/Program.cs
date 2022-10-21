@@ -13,8 +13,7 @@ namespace Client
         static void Main(string[] args)
         {
             string student_1 = "Darren Siriram 0999506";
-            // string student_2 = ;
-            
+
             byte[] buffer = new byte[1000];
             byte[] msg = new byte[100];
             // TODO: Initialise the socket/s as needed from the description of the assignment
@@ -27,21 +26,16 @@ namespace Client
             AckMSG ack = new AckMSG();
             CloseMSG cls = new CloseMSG();
 
+            h.From = student_1;
+            h.To = "Server";
+            h.ConID = 1;
+            h.Type = Messages.HELLO;
+
             try
             {
-                
-                //sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                //IPAddress broadcast = IPAddress.Parse("127.0.0.1");
-                
-                //Console.WriteLine($"[Client] send: {h.From}");
-                //IPEndPoint ep = new IPEndPoint(broadcast, clientPort);
-
-                // TODO: Instantiate and initialize your socket 
                 IPEndPoint endpoint = new IPEndPoint(broadcast, 5004);
-                // TODO: Send hello mesg
-                byte[] sendbuf = Encoding.ASCII.GetBytes("cap");
-                //byte[] test = Encoding.ASCII.GetBytes("Hello");
-                sock.SendTo(sendbuf, endpoint);
+                msg = Encoding.ASCII.GetBytes(Messages.HELLO.ToString());
+                sock.SendTo(msg, endpoint);
                 
                 // TODO: Receive and verify a HelloMSG 
 
