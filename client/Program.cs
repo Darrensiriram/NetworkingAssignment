@@ -13,9 +13,6 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            // TODO: add the student number of your group members as a string value. 
-            // string format example: "Jan Jansen 09123456" 
-            // If a group has only one member fill in an empty string for the second student
             string student_1 = "Darren Siriram 0999506";
             // string student_2 = ;
 
