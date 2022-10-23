@@ -13,7 +13,7 @@ namespace UDP_FTP.File_Handler
     class Communicate
     {
         private const string Server = "MyServer";
-        private string Client;
+        private const string Client = "Darren Siriram";
         private int SessionID;
         private Socket socket;
         private IPEndPoint remoteEndpoint;
@@ -27,19 +27,19 @@ namespace UDP_FTP.File_Handler
 
         public Communicate()
         {
-        
             IPAddress broadcast = IPAddress.Parse("127.0.0.1");
             remoteEndpoint = new IPEndPoint(broadcast, 5004);
-        
+
             buffer = new byte[1000];
-            msg = new byte[1024];
-        
+            msg = new byte[2048];
+
             Random id = new Random();
             SessionID = id.Next(1, 400);
-        
+
             remoteEP = new IPEndPoint(broadcast, 5004);
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Bind(remoteEndpoint);
+            
         }
 
         public ErrorType StartDownload()
@@ -52,30 +52,36 @@ namespace UDP_FTP.File_Handler
             DataMSG data = new DataMSG();
             AckMSG ack = new AckMSG();
             CloseMSG cls = new CloseMSG();
-
+            ConSettings c = new ConSettings();
+    
             GreetBack.From = Server;
             GreetBack.To = Client;
             GreetBack.ConID = SessionID;
-            GreetBack.Type = Messages.HELLO_REPLY;
+            GreetBack.Type = Messages.HELLO;
 
             req.From = Server;
             req.To = Client;
             req.Type = Messages.REQUEST;
-            
-                
+
+            c.To = Client;
+
+
             // TODO: Start the communication by receiving a HelloMSG message
-            Console.WriteLine("Message received from: {0}", remoteEP);
+            Console.WriteLine("Connection started: {0}", remoteEP);
             int recv = socket.ReceiveFrom(msg, SocketFlags.None, ref remoteEP);
-            Console.WriteLine(Encoding.ASCII.GetString(msg,0,recv));
-            // Receive and deserialize HelloMSG message 
-            // Verify if there are no errors
-            // Type must match one of the ConSettings' types and receiver address must be the server address
+            Console.WriteLine("Messaged received from: {0}. Content of the message: [{1}]", GreetBack.To, Encoding.ASCII.GetString(msg,0,recv));
+           
             
             // TODO: If no error is found then HelloMSG will be sent back
-            msg = Encoding.ASCII.GetBytes(Messages.HELLO_REPLY.ToString());
-            socket.SendTo(msg, remoteEP);
-
+            if (ErrorHandler.VerifyGreeting(GreetBack , c ) == ErrorType.NOERROR)
+            {
+                msg = Encoding.ASCII.GetBytes(Messages.HELLO_REPLY.ToString());
+                socket.SendTo(msg, remoteEP);
+            }
+            
             // TODO: Receive the next message
+            int x = socket.ReceiveFrom(msg, SocketFlags.None, ref remoteEP);
+            Console.WriteLine("Messaged received from: {0} and the message is: {1}",GreetBack.To, Encoding.ASCII.GetString(msg,0, x ));
             // Expected message is a download RequestMSG message containing the file name
             // Receive the message and verify if there are no errors
 

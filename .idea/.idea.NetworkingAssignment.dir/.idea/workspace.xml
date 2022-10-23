@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e0ecdbbb-d1f6-49e1-858d-8d8aa42cce30" name="Changes" comment="test">
+    <list default="true" id="e0ecdbbb-d1f6-49e1-858d-8d8aa42cce30" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NetworkingAssignment.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NetworkingAssignment.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/rider.project.restore.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/Error Handling/ErrorHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/Error Handling/ErrorHandler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file_download_server/File Handler/Communicate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/File Handler/Communicate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.csproj.AssemblyReference.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file_download_server/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,9 +21,8 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1a4013aa5e86ae67d11d8cf65ede743b324218b888c498e3a1ead78bf5bf22/IPEndPoint.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/darrensiriram/RiderProjects/NetworkingAssignment/client/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/611efef9cc4db44681420ed548e67f2174d4f12bb94a911f6f81a4ba7ca/Socket.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/client/obj/Debug/net6.0/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/darrensiriram/RiderProjects/NetworkingAssignment/file_download_server/File Handler/Communicate.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -39,15 +36,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Project.Client">
     <configuration name="Client" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -95,7 +92,9 @@
       <option name="presentableId" value="Default" />
       <updated>1666118378778</updated>
       <workItem from="1666118380596" duration="86000" />
-      <workItem from="1666362222110" duration="12912000" />
+      <workItem from="1666362222110" duration="13200000" />
+      <workItem from="1666431635716" duration="3600000" />
+      <workItem from="1666531241220" duration="8596000" />
     </task>
     <task id="LOCAL-00001" summary="setup initalized">
       <created>1666362509713</created>
@@ -111,7 +110,14 @@
       <option name="project" value="LOCAL" />
       <updated>1666385780528</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Connection with client and server fixed. &#10;Client send message to server">
+      <created>1666392163153</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1666392163153</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -134,6 +140,7 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="setup initalized" />
     <MESSAGE value="test" />
-    <option name="LAST_COMMIT_MESSAGE" value="test" />
+    <MESSAGE value="Connection with client and server fixed. &#10;Client send message to server" />
+    <option name="LAST_COMMIT_MESSAGE" value="Connection with client and server fixed. &#10;Client send message to server" />
   </component>
 </project>
