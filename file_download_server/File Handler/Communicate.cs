@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -21,6 +22,7 @@ namespace UDP_FTP.File_Handler
         private ErrorType Status;
         private byte[] buffer;
         byte[] msg;
+        byte[] reqMSG;
         private string file;
         ConSettings C;
 
@@ -30,11 +32,13 @@ namespace UDP_FTP.File_Handler
             IPAddress broadcast = IPAddress.Parse("127.0.0.1");
             remoteEndpoint = new IPEndPoint(broadcast, 5004);
 
-            buffer = new byte[1000];
-            msg = new byte[2048];
+            buffer = new byte[(int)Params.BUFFER_SIZE];
+            msg = new byte[1024];
+
+            reqMSG = new byte[1024];
 
             Random id = new Random();
-            SessionID = id.Next(1, 400);
+            SessionID = id.Next(1, 40);
 
             remoteEP = new IPEndPoint(broadcast, 5004);
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -64,6 +68,7 @@ namespace UDP_FTP.File_Handler
             req.Type = Messages.REQUEST;
 
             c.To = Client;
+            c.From = Server;
 
 
             // TODO: Start the communication by receiving a HelloMSG message
@@ -80,23 +85,46 @@ namespace UDP_FTP.File_Handler
             }
             
             // TODO: Receive the next message
-            int x = socket.ReceiveFrom(msg, SocketFlags.None, ref remoteEP);
-            Console.WriteLine("Messaged received from: {0} and the message is: {1}",GreetBack.To, Encoding.ASCII.GetString(msg,0, x ));
             // Expected message is a download RequestMSG message containing the file name
             // Receive the message and verify if there are no errors
-
+            if (ErrorHandler.VerifyRequest(req, c) == ErrorType.NOERROR)
+            {
+                int x = socket.ReceiveFrom(reqMSG, SocketFlags.None, ref remoteEP);
+                Console.WriteLine("Messaged received from: {0} and the message is: {1}",GreetBack.To, Encoding.ASCII.GetString(reqMSG,0, x ));
+                string reqMessage = Encoding.ASCII.GetString(reqMSG, 0, x);
+                var s = reqMessage.Split("&")[1];
+                req.FileName = s.Split(":")[1];
+                req.Status = ErrorType.NOERROR;
+            }
+            else
+            {
+                req.Status = ErrorType.BADREQUEST;
+                Console.WriteLine(ErrorType.BADREQUEST.ToString());
+            }
 
 
             // TODO: Send a RequestMSG of type REPLY message to remoteEndpoint verifying the status
-
+            if (req.Status == ErrorType.NOERROR)
+            {
+                string statusMessage = $"Status of the message is: {req.Status} message type: {Messages.REPLY}";
+                reqMSG = Encoding.ASCII.GetBytes(statusMessage);
+                socket.SendTo(reqMSG, remoteEP);    
+            }
+            
 
 
             // TODO:  Start sending file data by setting first the socket ReceiveTimeout value
+            socket.ReceiveTimeout = 5000;
+            string text = File.ReadAllText("../../../" + req.FileName);
+            Console.WriteLine(text.Length);
+            Console.WriteLine(text);
+            // 50 char in 12 pakketen
 
 
 
             // TODO: Open and read the text-file first
             // Make sure to locate a path on windows and macos platforms
+            
 
 
 

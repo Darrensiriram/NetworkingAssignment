@@ -14,8 +14,9 @@ namespace Client
         {
             string student_1 = "Darren Siriram 0999506";
 
-            byte[] buffer = new byte[1000];
-            byte[] msg = new byte[100];
+            byte[] buffer = new byte[(int)Params.BUFFER_SIZE];
+            byte[] msg = new byte[1024];
+            byte[] revReqMsg = new byte[1024];
             // TODO: Initialise the socket/s as needed from the description of the assignment
             Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPAddress ip = IPAddress.Parse("127.0.0.1");
@@ -26,17 +27,25 @@ namespace Client
             AckMSG ack = new AckMSG();
             CloseMSG cls = new CloseMSG();
             ConSettings c = new ConSettings();
+            Random id = new Random();
+            var chosenId = id.Next(1, 40);
 
             h.From = student_1;
             h.To = "Server";
-            h.ConID = 1;
+            h.ConID = chosenId;
             h.Type = Messages.HELLO;
 
             r.From = student_1;
             r.To = "Server";
             r.FileName = "test.txt";
+            r.ConID = chosenId;
             r.Type = Messages.REQUEST;
-            string req = "Type of message: " + r.Type + " File name:" + r.FileName; 
+            
+            c.ConID = chosenId;
+            c.From = student_1;
+            c.To = "Server";
+            
+            string req = "Type of message:" + r.Type + " & " + " File name:" + r.FileName + "& " + " Id:" + c.ConID;
 
             try
             {
@@ -57,8 +66,8 @@ namespace Client
                 // receive the message and verify if there are no errors
                 if (ErrorHandler.VerifyRequest(r, c) == ErrorType.NOERROR )
                 {
-                    int x = sock.ReceiveFrom(msg, SocketFlags.None, ref remoteEP);
-                    Console.WriteLine("Message received from {0} and the message is: {1}", r.From, Encoding.ASCII.GetString(msg, 0, x));
+                    int x = sock.ReceiveFrom(revReqMsg, SocketFlags.None, ref remoteEP);
+                    Console.WriteLine("Message received from {0} and the message is: {1}", r.From, Encoding.ASCII.GetString(revReqMsg, 0, x));
                 }
                 
 

@@ -18,6 +18,10 @@ namespace UDP_FTP.Error_Handling
         } 
         public static ErrorType VerifyRequest( RequestMSG req, ConSettings C)
         {
+           /* Console.WriteLine(req.ConID != C.ConID );
+            Console.WriteLine(req.From != C.From );
+            Console.WriteLine(req.To != C.To );
+            Console.WriteLine(req.Type != Messages.REQUEST);*/
             if (req.ConID != C.ConID || req.From != C.From || req.To != C.To || req.Type != Messages.REQUEST)
                 return ErrorType.BADREQUEST;
             return ErrorType.NOERROR;
