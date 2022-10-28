@@ -52,54 +52,51 @@ namespace UDP_FTP.File_Handler
 
         public ErrorType StartDownload()
         {
-            // TODO: Instantiate and initialize different messages needed for the communication
-            // required messages are: HelloMSG, RequestMSG, DataMSG, AckMSG, CloseMSG
-            // Set attribute values for each class accordingly 
             HelloMSG GreetBack = new HelloMSG();
             RequestMSG req = new RequestMSG();
             DataMSG data = new DataMSG();
             AckMSG ack = new AckMSG();
             CloseMSG cls = new CloseMSG();
             ConSettings c = new ConSettings();
+            Random id = new Random();
+            var chosenId = id.Next(1, 40);
     
             GreetBack.From = Server;
             GreetBack.To = Client;
             GreetBack.ConID = SessionID;
             GreetBack.Type = Messages.HELLO;
+            GreetBack.ConID = chosenId;
 
             req.From = Server;
             req.To = Client;
             req.Type = Messages.REQUEST;
+            req.ConID = chosenId;
 
             c.To = Client;
             c.From = Server;
             c.Sequence = 0;
+            c.ConID = chosenId;
 
             cls.From = Server;
             cls.To = Client;
             cls.Type = Messages.CLOSE_CONFIRM;
+            cls.ConID = chosenId;
 
             data.Type = Messages.DATA;
             data.From = Server;
             data.To = Client;
+            data.ConID = chosenId;
 
-
-            // TODO: Start the communication by receiving a HelloMSG message
             Console.WriteLine("Connection started: {0}", remoteEP);
             int recv = socket.ReceiveFrom(msg, SocketFlags.None, ref remoteEP);
             Console.WriteLine("Messaged received from: {0}. Content of the message: [{1}]", GreetBack.To, Encoding.ASCII.GetString(msg,0,recv));
            
-            
-            // TODO: If no error is found then HelloMSG will be sent back
             if (ErrorHandler.VerifyGreeting(GreetBack , c ) == ErrorType.NOERROR)
             {
-                msg = Encoding.ASCII.GetBytes(Messages.HELLO_REPLY.ToString());
+                msg = Encoding.ASCII.GetBytes(GreetBack.ConID.ToString() + "|" + Messages.HELLO_REPLY.ToString());
                 socket.SendTo(msg, remoteEP);
             }
-            
-            // TODO: Receive the next message
-            // Expected message is a download RequestMSG message containing the file name
-            // Receive the message and verify if there are no errors
+        
             if (ErrorHandler.VerifyRequest(req, c) == ErrorType.NOERROR)
             {
                 int x = socket.ReceiveFrom(reqMSG, SocketFlags.None, ref remoteEP);
@@ -108,6 +105,7 @@ namespace UDP_FTP.File_Handler
                 var s = reqMessage.Split("&")[1];
                 req.FileName = s.Split(":")[1];
                 req.Status = ErrorType.NOERROR;
+                
             }
             else
             {
@@ -115,8 +113,6 @@ namespace UDP_FTP.File_Handler
                 Console.WriteLine(ErrorType.BADREQUEST.ToString());
             }
 
-
-            // TODO: Send a RequestMSG of type REPLY message to remoteEndpoint verifying the status
             if (req.Status == ErrorType.NOERROR)
             {
                 string statusMessage = $"Status of the message is: {req.Status} message type: {Messages.REPLY}";
@@ -124,51 +120,53 @@ namespace UDP_FTP.File_Handler
                 socket.SendTo(reqMSG, remoteEP);    
             }
             
-
-
-            // TODO:  Start sending file data by setting first the socket ReceiveTimeout value
             socket.ReceiveTimeout = 5000;
-            string text = "";
+            string filelocation = "";
             if(OperatingSystem.IsWindows()){
-                text = File.ReadAllText(req.FileName);
+                filelocation = req.FileName;
             }
             if(OperatingSystem.IsMacOS()){
-                text = File.ReadAllText("../../../" + req.FileName);
+                filelocation = "../../../" + req.FileName;
             }
             
-            byte[] fileBytes = File.ReadAllBytes(req.FileName); //Convert tekst file into bytes
+            byte[] fileBytes = File.ReadAllBytes(filelocation); //Convert tekst file into bytes
             byte[][] chunk = new byte[(int)Params.WINDOW_SIZE][]; //prepare byte array with size of windows size
-
-            //variables configuration
-            int maxFileSize = 0;
-            int maxChuckSize = 0;
+            data.Size = fileBytes.Length / (int)Params.SEGMENT_SIZE; // calculate how many byte can be send within a segmentSize
+            data.More = true;
+            var secondLast = fileBytes.Length - data.Size;
+            
             int fileIndex = 0;
             int checkWindowSize = 0;
-            int packetNumber = 0;
+            data.Sequence = 0;
 
-            
-            while(true)
+            while(data.More)
             {
                 for (int i = 0; i < chunk.Length; i++)
                 {
-                    chunk[i] = new byte[fileBytes.Length / (int)Params.SEGMENT_SIZE]; //Calculate bytes one chunk send and make array
-                    for (int j = 0; j < chunk[i].Length; j++) //Loops calculated chunk untill it is full or ends
+                    chunk[i] = new byte[data.Size]; //Calculate bytes one chunk send and make array
+                    for (int j = 0; j < chunk[i].Length; j++) //Loops calculated chunk until it is full or ends
                     {
-                        chunk[i][j] = fileBytes[fileIndex]; //Fill chunk of window size with value fileIndex | chunk = [windowsize][calculated byte from the message]
+                        chunk[i][j] = fileBytes[fileIndex]; //Fill chunk of window size with value fileIndex | chunk = [window size][calculated byte from the message]
                         fileIndex++;
-                        if(fileIndex == fileBytes.Length) //If index equals file.length. end loop
-                        {
-                            break;
-                        }
+                       // if(fileIndex == fileBytes.Length) //If index equals file.length. end loop
+                        //{
+                         //   break;
+                        //}
                     }
-                    byte[] sendPacket = Encoding.ASCII.GetBytes(packetNumber + "|" + Encoding.ASCII.GetString(chunk[i]));
-                    socket.SendTo(sendPacket, remoteEP);
-                    packetNumber++;
+                    if (secondLast <= fileIndex)
+                    {
+                        data.More = false;
+                    }
+                    //Console.WriteLine(data.Sequence + "|" + Encoding.ASCII.GetString(chunk[i]) + data.More);
                     
+                    byte[] sendPacket = Encoding.ASCII.GetBytes(data.Sequence + "|" + Encoding.ASCII.GetString(chunk[i]) + "|" + data.More + "|" + data.Size);
+                    socket.SendTo(sendPacket, remoteEP);
+                    data.Sequence++;
 
                     checkWindowSize++;
                     if(checkWindowSize == (int)Params.WINDOW_SIZE)
                     {
+                        checkWindowSize = 0;
                         socket.SendTimeout = 1000;
                         int max = 1;
                         bool confirm = true;
@@ -178,7 +176,8 @@ namespace UDP_FTP.File_Handler
                             Console.WriteLine("Message received from {0} and the message is: {1}", req.From, Encoding.ASCII.GetString(revackMsg, 0, x));
                             if(Encoding.ASCII.GetString(revackMsg, 0, x) != Messages.ACK.ToString())
                             {
-                                //If chunk has not been confirmed by client
+                                Console.WriteLine("davghdvashjdbahjbdjas");
+                                //If chunk has not been confirmed by client 
                                 break;
                             }
                             if(max == (int)Params.WINDOW_SIZE)
@@ -187,10 +186,8 @@ namespace UDP_FTP.File_Handler
                             }
                             max++;
                         }
-                        break;
                     }
-                    //Console.WriteLine(Encoding.ASCII.GetString(chunk[i]));
-                    if(fileIndex == fileBytes.Length)
+                    if(data.More == false)
                     {
                         socket.SendTo(Encoding.ASCII.GetBytes(Messages.CLOSE_REQUEST.ToString()), remoteEP);
                         break;
@@ -206,50 +203,13 @@ namespace UDP_FTP.File_Handler
             
             int xd = socket.ReceiveFrom(revclsMsg, SocketFlags.None, ref remoteEP);
             Console.WriteLine("Message received from {0} and the message is: {1}", req.From, Encoding.ASCII.GetString(revclsMsg, 0, xd));
-            cls.ConID = Int32.Parse(Encoding.ASCII.GetString(revclsMsg, 0, xd).Split("|")[1]);
-            c.ConID = Int32.Parse(Encoding.ASCII.GetString(revclsMsg, 0, xd).Split("|")[1]);
+            //Console.WriteLine(Encoding.ASCII.GetString(revclsMsg, 0, xd));
+            //cls.ConID = Int32.Parse(Encoding.ASCII.GetString(revclsMsg, 0, xd).Split("|")[1]);
+            //c.ConID = Int32.Parse(Encoding.ASCII.GetString(revclsMsg, 0, xd).Split("|")[1]);
             if(ErrorHandler.VerifyClose(cls, c) == ErrorType.NOERROR)
             {
                 socket.Close();
             }
-            
-
-            // TODO: Open and read the text-file first
-            // Make sure to locate a path on windows and macos platforms
-            
-
-
-
-            // TODO: Sliding window with go-back-n implementation
-            // Calculate the length of data to be sent
-            // Send file-content as DataMSG message as long as there are still values to be sent
-            // Consider the WINDOW_SIZE and SEGMENT_SIZE when sending a message  
-            // Make sure to address the case if remaining bytes are less than WINDOW_SIZE
-            //
-            // Suggestion: while there are still bytes left to send,
-            // first you send a full window of data
-            // second you wait for the acks
-            // then you start again.
-
-
-
-            // TODO: Receive and verify the acknowledgements (AckMSG) of sent messages
-            // Your client implementation should send an AckMSG message for each received DataMSG message   
-
-
-
-            // TODO: Print each confirmed sequence in the console
-            // receive the message and verify if there are no errors
-
-
-            // TODO: Send a CloseMSG message to the client for the current session
-            // Send close connection request
-
-            // TODO: Receive and verify a CloseMSG message confirmation for the current session
-            // Get close connection confirmation
-            // Receive the message and verify if there are no errors
-
-
             //Console.WriteLine("Group members: {0} | {1}", student_1, student_2);
             return ErrorType.NOERROR;
         }
