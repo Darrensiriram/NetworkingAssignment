@@ -92,6 +92,8 @@ namespace Client
                 {
                     int x = sock.ReceiveFrom(revackMsg, SocketFlags.None, ref remoteEP);
                     Console.WriteLine("Message received from {0} and the message is: {1}", r.From, Encoding.ASCII.GetString(revackMsg, 0, x));
+                    string packetNumber = Encoding.ASCII.GetString(revackMsg, 0, x).Split("|")[0];
+                    string split1 = Encoding.ASCII.GetString(revackMsg, 0, x).Split("|")[0];
                     fullText += Encoding.ASCII.GetString(revackMsg, 0, x);
                     ack.Sequence++;
                     if(ErrorHandler.VerifyAck(ack, c) == ErrorType.NOERROR)
@@ -99,7 +101,7 @@ namespace Client
                         //if message correct, send correct back
                         sock.SendTo(Encoding.ASCII.GetBytes(Messages.ACK.ToString()), remoteEP);
                     } else {
-                        sock.SendTo(Encoding.ASCII.GetBytes(ack.Sequence.ToString()), remoteEP);
+                        sock.SendTo(Encoding.ASCII.GetBytes(packetNumber.ToString()), remoteEP);
                     }
                     if((int)Params.WINDOW_SIZE == ack.Sequence)
                     {

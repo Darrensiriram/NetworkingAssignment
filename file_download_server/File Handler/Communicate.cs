@@ -79,6 +79,10 @@ namespace UDP_FTP.File_Handler
             cls.To = Client;
             cls.Type = Messages.CLOSE_CONFIRM;
 
+            data.Type = Messages.DATA;
+            data.From = Server;
+            data.To = Client;
+
 
             // TODO: Start the communication by receiving a HelloMSG message
             Console.WriteLine("Connection started: {0}", remoteEP);
@@ -140,6 +144,7 @@ namespace UDP_FTP.File_Handler
             int maxChuckSize = 0;
             int fileIndex = 0;
             int checkWindowSize = 0;
+            int packetNumber = 0;
 
             
             while(true)
@@ -156,7 +161,9 @@ namespace UDP_FTP.File_Handler
                             break;
                         }
                     }
-                    socket.SendTo(chunk[i], remoteEP);
+                    byte[] sendPacket = Encoding.ASCII.GetBytes(packetNumber + "|" + Encoding.ASCII.GetString(chunk[i]));
+                    socket.SendTo(sendPacket, remoteEP);
+                    packetNumber++;
                     
 
                     checkWindowSize++;
@@ -164,12 +171,17 @@ namespace UDP_FTP.File_Handler
                     {
                         socket.SendTimeout = 1000;
                         int max = 1;
+                        bool confirm = true;
                         while(true)
                         {
                             int x = socket.ReceiveFrom(revackMsg, SocketFlags.None, ref remoteEP);
                             Console.WriteLine("Message received from {0} and the message is: {1}", req.From, Encoding.ASCII.GetString(revackMsg, 0, x));
-                            Console.WriteLine(max);
-                            if(max == 5)
+                            if(Encoding.ASCII.GetString(revackMsg, 0, x) != Messages.ACK.ToString())
+                            {
+                                //If chunk has not been confirmed by client
+                                break;
+                            }
+                            if(max == (int)Params.WINDOW_SIZE)
                             {
                                 break;
                             }
@@ -190,22 +202,6 @@ namespace UDP_FTP.File_Handler
                 {
                     break;
                 }
-
-                
-                
-                // if (checkWindowSize == (int)Params.WINDOW_SIZE)
-                // {
-                //     checkWindowSize = 0;
-                //     for (int i = 0; i < (int)Params.WINDOW_SIZE; i++)
-                //     {
-                //         //send packages
-                //     }
-                // }
-
-                // if (maxFileSize == fileBytes.Length)
-                // {
-                //     //Max size reached of array
-                // }
             }
             
             int xd = socket.ReceiveFrom(revclsMsg, SocketFlags.None, ref remoteEP);
@@ -216,13 +212,6 @@ namespace UDP_FTP.File_Handler
             {
                 socket.Close();
             }
-            
-            // Console.WriteLine("--------------------------------");
-            // foreach(var x in chunk)
-            // {
-            //     Console.WriteLine(Encoding.ASCII.GetString(x));
-            // }
-            // Console.WriteLine("--------------------------------");
             
 
             // TODO: Open and read the text-file first
