@@ -1,0 +1,6 @@
+.idea
+.git
+client/bin/
+client/obj
+file_download_server/bin
+file_download_server/obj

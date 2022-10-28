@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e0ecdbbb-d1f6-49e1-858d-8d8aa42cce30" name="Changes" comment="">
+    <list default="true" id="e0ecdbbb-d1f6-49e1-858d-8d8aa42cce30" name="Changes" comment="FINISHED">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NetworkingAssignment.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NetworkingAssignment.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file_download_server/Error Handling/ErrorHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/Error Handling/ErrorHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file_download_server/File Handler/Communicate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/File Handler/Communicate.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/bin/Debug/net6.0/Client.dll" beforeDir="false" afterPath="$PROJECT_DIR$/client/bin/Debug/net6.0/Client.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/bin/Debug/net6.0/Client.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/client/bin/Debug/net6.0/Client.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/Client.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/Client.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/Client.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/Client.csproj.nuget.g.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.assets.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.dll" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.genruntimeconfig.cache" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.genruntimeconfig.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/Debug/net6.0/Client.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/project.nuget.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/client/obj/rider.project.restore.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/bin/Debug/net6.0/UDP_FTP.dll" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/bin/Debug/net6.0/UDP_FTP.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/bin/Debug/net6.0/UDP_FTP.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/bin/Debug/net6.0/UDP_FTP.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.assets.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.dll" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.genruntimeconfig.cache" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.genruntimeconfig.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/Debug/net6.0/UDP_FTP.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/UDP_FTP.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/UDP_FTP.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/UDP_FTP.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/UDP_FTP.csproj.nuget.g.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/project.nuget.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file_download_server/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/file_download_server/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,10 +44,23 @@
       </map>
     </option>
   </component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="dev" />
+      </list>
+    </option>
+  </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/036133008b84439481e0b7281e8b7aecb55800/97/766bf878/File.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1a4013aa5e86ae67d11d8cf65ede743b324218b888c498e3a1ead78bf5bf22/IPEndPoint.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/611efef9cc4db44681420ed548e67f2174d4f12bb94a911f6f81a4ba7ca/Socket.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/darrensiriram/RiderProjects/NetworkingAssignment/client/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/darrensiriram/RiderProjects/NetworkingAssignment/client/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/client/obj/Debug/net6.0/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/darrensiriram/RiderProjects/NetworkingAssignment/file_download_server/File Handler/Communicate.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -45,7 +83,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected=".NET Project.Client">
+  <component name="RunManager" selected=".NET Project.UDP_FTP">
     <configuration name="Client" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -117,7 +155,14 @@
       <option name="project" value="LOCAL" />
       <updated>1666392163153</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="FINISHED">
+      <created>1666992116259</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1666992116259</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -141,6 +186,7 @@
     <MESSAGE value="setup initalized" />
     <MESSAGE value="test" />
     <MESSAGE value="Connection with client and server fixed. &#10;Client send message to server" />
-    <option name="LAST_COMMIT_MESSAGE" value="Connection with client and server fixed. &#10;Client send message to server" />
+    <MESSAGE value="FINISHED" />
+    <option name="LAST_COMMIT_MESSAGE" value="FINISHED" />
   </component>
 </project>
