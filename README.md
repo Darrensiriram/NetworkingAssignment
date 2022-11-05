@@ -1,6 +1,6 @@
 # Info:
-Student : Darren Siriram (0999506)
-Student : Ertugrul Karaduman (0997475)
+- Student : Darren Siriram (0999506)
+- Student : Ertugrul Karaduman (0997475)
 
 
 
