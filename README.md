@@ -7,14 +7,14 @@
 ## Software requirement:
 - .NET >6 
 
-## How to run
+## How to run using IDEA
 - Clone the repo to your machine.
 - Open the repo with Rider or visual studio code.
 - open the solution
 - Run Server side first
 - Run Client side after.
 
-## Optional
+## How to run using Terminal
 - open a terminal and navigate to the repo.
 - navigate to the file_download_server folder and type: dotnet run
 - navigate to the client folder and type dotnet run
