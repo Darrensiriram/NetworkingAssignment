@@ -126,10 +126,12 @@ namespace UDP_FTP.File_Handler
             if(OperatingSystem.IsWindows()){
                 filelocation = req.FileName;
             }
-            if(OperatingSystem.IsMacOS()){
-                filelocation = "../../../" + req.FileName;
-            }
             
+            if(OperatingSystem.IsMacOS())
+            {
+                filelocation =  req.FileName;
+            }
+
             byte[] fileBytes = File.ReadAllBytes(filelocation); //Convert tekst file into bytes
             byte[][] chunk = new byte[(int)Params.WINDOW_SIZE][]; //prepare byte array with size of windows size
             data.Size = fileBytes.Length / (int)Params.SEGMENT_SIZE + 1; // calculate how many byte can be send within a segmentSize
