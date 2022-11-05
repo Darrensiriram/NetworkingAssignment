@@ -4,10 +4,10 @@ Student : Ertugrul Karaduman (0997475)
 
 
 
-##Software requirement:
+## Software requirement:
 - .NET >6 
 
-##How to run
+## How to run
 - Clone the repo to your machine.
 - Open the repo with any code editor(optional)
 - open a terminal and navigate to the repo.
