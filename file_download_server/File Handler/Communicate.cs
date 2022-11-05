@@ -44,7 +44,7 @@ namespace UDP_FTP.File_Handler
             Random id = new Random();
             SessionID = id.Next(1, 40);
 
-            remoteEP = new IPEndPoint(broadcast, 5004);
+            remoteEP = new IPEndPoint(broadcast, 5010);
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Bind(remoteEndpoint);
             
@@ -86,6 +86,7 @@ namespace UDP_FTP.File_Handler
             data.From = Server;
             data.To = Client;
             data.ConID = chosenId;
+            data.Data = new byte[(int)Params.SEGMENT_SIZE];
 
             Console.WriteLine("Connection started: {0}", remoteEP);
             int recv = socket.ReceiveFrom(msg, SocketFlags.None, ref remoteEP);
@@ -131,38 +132,41 @@ namespace UDP_FTP.File_Handler
             
             byte[] fileBytes = File.ReadAllBytes(filelocation); //Convert tekst file into bytes
             byte[][] chunk = new byte[(int)Params.WINDOW_SIZE][]; //prepare byte array with size of windows size
-            data.Size = fileBytes.Length / (int)Params.SEGMENT_SIZE; // calculate how many byte can be send within a segmentSize
+            data.Size = fileBytes.Length / (int)Params.SEGMENT_SIZE + 1; // calculate how many byte can be send within a segmentSize
             data.More = true;
-            var secondLast = fileBytes.Length - data.Size;
-            
+            var secondLast = 522;
+
             int fileIndex = 0;
             int checkWindowSize = 0;
             data.Sequence = 0;
+      
 
             while(data.More)
             {
+                
                 for (int i = 0; i < chunk.Length; i++)
                 {
                     chunk[i] = new byte[data.Size]; //Calculate bytes one chunk send and make array
                     for (int j = 0; j < chunk[i].Length; j++) //Loops calculated chunk until it is full or ends
                     {
-                        chunk[i][j] = fileBytes[fileIndex]; //Fill chunk of window size with value fileIndex | chunk = [window size][calculated byte from the message]
-                        fileIndex++;
-                       // if(fileIndex == fileBytes.Length) //If index equals file.length. end loop
-                        //{
-                         //   break;
-                        //}
+                        if (fileIndex < fileBytes.Length)
+                        {
+                            chunk[i][j] = fileBytes[fileIndex]; //Fill chunk of window size with value fileIndex | chunk = [window size][calculated byte from the message]
+                            fileIndex++;
+                        }
+                        else
+                        {
+                            data.More = false;
+                        }
                     }
-                    if (secondLast <= fileIndex)
-                    {
-                        data.More = false;
-                    }
-                    //Console.WriteLine(data.Sequence + "|" + Encoding.ASCII.GetString(chunk[i]) + data.More);
-                    
-                    byte[] sendPacket = Encoding.ASCII.GetBytes(data.Sequence + "|" + Encoding.ASCII.GetString(chunk[i]) + "|" + data.More + "|" + data.Size);
+
+                    data.Data = chunk[i];
+                    byte[] sendPacket = Encoding.ASCII.GetBytes(data.Sequence + "|" + Encoding.ASCII.GetString(data.Data) + "|" + data.More + "|" + data.Size);
                     socket.SendTo(sendPacket, remoteEP);
                     data.Sequence++;
-
+                    c.Sequence += sendPacket.Length;
+                    
+                    // takes care of ACK message
                     checkWindowSize++;
                     if(checkWindowSize == (int)Params.WINDOW_SIZE)
                     {
@@ -176,8 +180,9 @@ namespace UDP_FTP.File_Handler
                             Console.WriteLine("Message received from {0} and the message is: {1}", req.From, Encoding.ASCII.GetString(revackMsg, 0, x));
                             if(Encoding.ASCII.GetString(revackMsg, 0, x) != Messages.ACK.ToString())
                             {
-                                Console.WriteLine("davghdvashjdbahjbdjas");
-                                //If chunk has not been confirmed by client 
+                                int packetNumber = Int32.Parse(Encoding.ASCII.GetString(revackMsg, 0, x)) - 1;
+                                fileIndex = (packetNumber * data.Size) - data.Size; // 464
+                                data.More = true;
                                 break;
                             }
                             if(max == (int)Params.WINDOW_SIZE)
@@ -187,6 +192,7 @@ namespace UDP_FTP.File_Handler
                             max++;
                         }
                     }
+
                     if(data.More == false)
                     {
                         socket.SendTo(Encoding.ASCII.GetBytes(Messages.CLOSE_REQUEST.ToString()), remoteEP);
@@ -194,23 +200,15 @@ namespace UDP_FTP.File_Handler
                     }
                     
                 }
-                
-                if(fileIndex == fileBytes.Length)
-                {
-                    break;
-                }
             }
+            
             
             int xd = socket.ReceiveFrom(revclsMsg, SocketFlags.None, ref remoteEP);
             Console.WriteLine("Message received from {0} and the message is: {1}", req.From, Encoding.ASCII.GetString(revclsMsg, 0, xd));
-            //Console.WriteLine(Encoding.ASCII.GetString(revclsMsg, 0, xd));
-            //cls.ConID = Int32.Parse(Encoding.ASCII.GetString(revclsMsg, 0, xd).Split("|")[1]);
-            //c.ConID = Int32.Parse(Encoding.ASCII.GetString(revclsMsg, 0, xd).Split("|")[1]);
             if(ErrorHandler.VerifyClose(cls, c) == ErrorType.NOERROR)
             {
                 socket.Close();
             }
-            //Console.WriteLine("Group members: {0} | {1}", student_1, student_2);
             return ErrorType.NOERROR;
         }
     }

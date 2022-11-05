@@ -13,6 +13,7 @@ namespace Client
         static void Main(string[] args)
         {
             string student_1 = "Darren Siriram 0999506";
+            string student_2 = "Ertugrul Karaduman 0997475";
 
             byte[] buffer = new byte[(int)Params.BUFFER_SIZE];
             byte[] msg = new byte[1024];
@@ -42,7 +43,7 @@ namespace Client
             
             c.From = student_1;
             c.To = "Server";
-            c.Sequence = 0;
+            c.Sequence = 0; 
 
             ack.From = student_1;
             ack.To = "Server";
@@ -56,7 +57,7 @@ namespace Client
             try
             {
                 IPEndPoint endpoint = new IPEndPoint(ip, 5004);
-                EndPoint remoteEP = new IPEndPoint(ip, 5004);
+                EndPoint remoteEP = new IPEndPoint(ip, 5010);
                 msg = Encoding.ASCII.GetBytes(Messages.HELLO.ToString());
                 sock.SendTo(msg, endpoint);
 
@@ -101,7 +102,7 @@ namespace Client
 
                     if (ack.Sequence == (int)Params.WINDOW_SIZE)
                     {
-                        ack.Sequence = 0;
+                      ack.Sequence = 0;
                     }
                     string boolingValue = Encoding.ASCII.GetString(revackMsg, 0, x).Split("|")[2];
                     if(boolingValue == "False")
@@ -109,8 +110,7 @@ namespace Client
                      break;
                     }
                 }
-                //Console.WriteLine(fullText);
-                
+
                 int xd = sock.ReceiveFrom(revcloMsg, SocketFlags.None, ref remoteEP);
                 Console.WriteLine("Message received from {0} and the message is: {1}", r.From, Encoding.ASCII.GetString(revcloMsg, 0, xd));
                 

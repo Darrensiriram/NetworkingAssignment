@@ -12,14 +12,14 @@ namespace UDP_FTP
         static void Main(string[] args)
         {
             string student_1 = "Darren Siriram 0999506" ;
-            string student_2 = "";
+            string student_2 = "Ertugrul Karaduman 0997475";
 
             
             Console.WriteLine("Server is waiting for new request!");
             Communicate FileShare = new Communicate();
             Console.WriteLine("The file download request terminated with code {0}.", FileShare.StartDownload());
 
-            Console.WriteLine("Group members: {0}  {1}", student_1, student_2);
+            Console.WriteLine("Group members: {0} , {1}", student_1, student_2);
         }
     }
 }
