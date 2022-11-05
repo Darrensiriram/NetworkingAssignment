@@ -8,24 +8,26 @@
     "net6.0": []
   },
   "packageFolders": {
-    "/Users/darrensiriram/.nuget/packages/": {}
+    "C:\\Users\\ertug\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/darrensiriram/RiderProjects/NetworkingAssignment/file_download_server/UDP_FTP.csproj",
+      "projectUniqueName": "C:\\Users\\ertug\\Desktop\\school\\Analyse - Networking\\NetworkingAssignment-fix-clientSide\\NetworkingAssignment\\file_download_server\\UDP_FTP.csproj",
       "projectName": "UDP_FTP",
-      "projectPath": "/Users/darrensiriram/RiderProjects/NetworkingAssignment/file_download_server/UDP_FTP.csproj",
-      "packagesPath": "/Users/darrensiriram/.nuget/packages/",
-      "outputPath": "/Users/darrensiriram/RiderProjects/NetworkingAssignment/file_download_server/obj/",
+      "projectPath": "C:\\Users\\ertug\\Desktop\\school\\Analyse - Networking\\NetworkingAssignment-fix-clientSide\\NetworkingAssignment\\file_download_server\\UDP_FTP.csproj",
+      "packagesPath": "C:\\Users\\ertug\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ertug\\Desktop\\school\\Analyse - Networking\\NetworkingAssignment-fix-clientSide\\NetworkingAssignment\\file_download_server\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/darrensiriram/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\ertug\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -49,8 +51,7 @@
           "net47",
           "net471",
           "net472",
-          "net48",
-          "net481"
+          "net48"
         ],
         "assetTargetFallback": true,
         "warn": true,
@@ -59,7 +60,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/Users/darrensiriram/.dotnet/sdk/6.0.402/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.305\\RuntimeIdentifierGraph.json"
       }
     }
   }
