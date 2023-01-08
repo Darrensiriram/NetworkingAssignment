@@ -129,7 +129,7 @@ namespace UDP_FTP.File_Handler
             
             if(OperatingSystem.IsMacOS())
             {
-                filelocation =  req.FileName;
+                filelocation = "../../../" + req.FileName;
             }
 
             byte[] fileBytes = File.ReadAllBytes(filelocation); //Convert tekst file into bytes
