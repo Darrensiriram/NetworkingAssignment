@@ -24,3 +24,23 @@
 when u occur the error that the file is not found. make sure that you have set your working directory
 to the the folder of file_download_server in your IDEA.
 ```
+
+
+To run the test-server to test your client implementation.
+# Setup and run (running docker environment)
+## Install
+If not already installed go to the website of docker and install it on your machine.
+Once docker is installed and started follow the steps bellow to connect your client implementation to the server.
+## Step 1: Load
+<!-- navigate in your command line to directory where the udp_server-image.tar image is stored -->
+<!-- type the following command in your command line to load the image-->
+<!-- load and run image from URL as .tar -->
+docker load < udp_server-image.tar
+## Step 2: Check
+<!-- type the following command in your command line to see if the image is now enlisted. Your docker image name must match with the image name of the command in step 3. If you are using docker desktop you should be able to see it in the images section  -->
+docker image ls
+## Step 2: Run
+<!-- run the image as a container that listens to UPD protocol on port 5004. Be aware the UDP must be included in the command otherwise it will listen to TCP by default and the server will not communicate with your client -->
+<!-- server -->
+docker run -i -t -p 127.0.0.1:32000:32000/udp udp_server-image:latest
+<!-- Once a container is created you can use docker desktop to rerun the container and test your implementation. There is no need to execute the command above again as it will create a new container with a different name every time -->
