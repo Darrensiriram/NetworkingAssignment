@@ -35,7 +35,10 @@ Once docker is installed and started follow the steps bellow to connect your cli
 <!-- navigate in your command line to directory where the udp_server-image.tar image is stored -->
 <!-- type the following command in your command line to load the image-->
 <!-- load and run image from URL as .tar -->
+### Macos Command: 
 docker load < udp_server-image.tar
+### Windows Command:
+docker load --input udp_server-image.tar
 ## Step 2: Check
 <!-- type the following command in your command line to see if the image is now enlisted. Your docker image name must match with the image name of the command in step 3. If you are using docker desktop you should be able to see it in the images section  -->
 docker image ls
