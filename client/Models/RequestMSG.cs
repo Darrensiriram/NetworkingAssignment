@@ -13,10 +13,9 @@ namespace UDP_FTP.Models
         public string From { get; set; }
         public string To { get; set; }
         public string FileName { get; set; }
+        public int WindowSize { get; set; }
+        public int SegmentSize { get; set; }
         public int ConID { get; set; }
         public ErrorType Status { get; set; }
-        
-        public int WindowsSize { get; set; }
-        public int SegmentSize { get; set; }
     }
 }

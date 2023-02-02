@@ -31,6 +31,9 @@ To run the test-server to test your client implementation.
 ## Install
 If not already installed go to the website of docker and install it on your machine.
 Once docker is installed and started follow the steps bellow to connect your client implementation to the server.
+### Notice! 
+Make sure to ```enable hyper V``` in your windows settings if you are using windows and install with```hyper-v``` instead of ```WSL2```
+
 ## Step 1: Load
 <!-- navigate in your command line to directory where the udp_server-image.tar image is stored -->
 <!-- type the following command in your command line to load the image-->
