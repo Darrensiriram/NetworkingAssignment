@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +7,7 @@ using static UDP_FTP.Models.Enums;
 
 namespace UDP_FTP.Models
 {
-    public class RequestMSG
+    class ReplyMSG
     {
         public Messages Type { get; set; }
         public string From { get; set; }
