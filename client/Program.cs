@@ -17,12 +17,14 @@ namespace Client
             string student_1 = "Darren Siriram 0999506";
             string student_2 = "Ertugrul Karaduman 0997475";
             
-            List<int> LostAck = new List<int> { 8 };
+            List<int> LostAck = new List<int> { 3, 6 };
             byte[] revmsg = new byte[2048];
             byte[] buffer = new byte[2048];
             byte[] data = new byte[2048];
             byte[] ackb = new byte[2048];
+            byte[] close = new byte[2048];
             Socket sock;
+            //TODO: Change the IP address to Any
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 32000); 
             EndPoint remoteEp = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 32000);
             
@@ -78,18 +80,16 @@ namespace Client
                 DataMSG DMSG = JsonSerializer.Deserialize<DataMSG>(ref utf8Reader3);
 
                 int count = 0;
-                int windowCount = 0;
-                int tempSeq = 0;
                 string message = "";
-                List<bool> sets = new List<bool> { };
+                message += Encoding.UTF8.GetString(DMSG.Data);
+                List<int> seqList = new List<int> { };
+
+                Console.WriteLine("[" + DMSG.Sequence + "]" + " " + DMSG.Data.Length + " bytes received | last packet: " + DMSG.More);
                 while(DMSG.More)
                 {
                     if (LostAck.Contains(DMSG.Sequence))
                     {
-                        //Console.WriteLine("ack lost");
                         LostAck.Remove(DMSG.Sequence);
-                        tempSeq = count;
-                        sets.Add(false);
                     }
                     else
                     {   
@@ -97,27 +97,45 @@ namespace Client
                         ack.From = DMSG.To;
                         ack.To = DMSG.From;
                         ack.ConID = DMSG.ConID;
-                        ack.Sequence = count;
+                        ack.Sequence = DMSG.Sequence;
                         ackb = JsonSerializer.SerializeToUtf8Bytes(ack);
                         sock.SendTo(ackb, ackb.Length, SocketFlags.None, endPoint);
-                        sets.Add(true);
-                        count++;
-                        //Console.WriteLine("-------------------------");
-                        Console.WriteLine("Sequence: {0}", DMSG.Sequence);
-                        //Console.WriteLine(Encoding.UTF8.GetString(DMSG.Data));
-                        //Console.WriteLine("Sequence: {0}", ack.Sequence);
+                        seqList.Add(DMSG.Sequence);
                     }
-                    
+                    count++;
                     
                     byte[] msg = new byte[2048];
                     sock.ReceiveFrom(msg, ref remoteEp);
                     var utf8Reader4 = new Utf8JsonReader(msg);
                     DMSG = JsonSerializer.Deserialize<DataMSG>(ref utf8Reader4);
-                    
-                }
-                Console.WriteLine("-------------------------");
-                
 
+                    if(seqList.Contains(DMSG.Sequence))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        message += Encoding.UTF8.GetString(DMSG.Data);
+                    }
+                    Console.WriteLine("[" + DMSG.Sequence + "]" + " " + DMSG.Data.Length + " bytes received | last packet: " + DMSG.More);
+                }
+            Console.WriteLine("Message: {0}", message);
+
+            sock.ReceiveFrom(close, ref remoteEp);
+            var utf8Reader5 = new Utf8JsonReader(close);
+            CloseMSG CLS = JsonSerializer.Deserialize<CloseMSG>(ref utf8Reader5);
+            if (CLS.Type == Messages.CLOSE_REQUEST)
+            {
+                Console.WriteLine("[Server] Closing connection...");
+                cls.Type = Messages.CLOSE_CONFIRM;
+                cls.From = CLS.To;
+                cls.To = CLS.From;
+                cls.ConID = CLS.ConID;
+                byte[] closeByte = JsonSerializer.SerializeToUtf8Bytes(cls);
+                sock.SendTo(closeByte, closeByte.Length, SocketFlags.None, endPoint);
+
+                Environment.Exit(0);
+            }
             }
             catch (SocketException e)
             {
