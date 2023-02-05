@@ -120,16 +120,90 @@ namespace UDP_FTP.File_Handler
             string filelocation = "";
             if (OperatingSystem.IsWindows())
             {
-                filelocation = req.FileName;
+                filelocation = receivedRequestMessage.FileName;
             }
             else if (OperatingSystem.IsMacOS())
             {
-                filelocation = "../../../" + req.FileName;
+                filelocation = "../../../" + receivedRequestMessage.FileName;
             }
             else
             {
                 return ErrorType.BADREQUEST;
             }
+            
+            Console.WriteLine(receivedRequestMessage.FileName + receivedRequestMessage.Type);
+           
+            byte[] fileBytes = File.ReadAllBytes(filelocation); //Convert tekst file into bytes
+            byte[][] chunk = new byte[receivedRequestMessage.WindowSize][]; //prepare byte array with size of windows size
+            data.Size = fileBytes.Length / receivedRequestMessage.SegmentSize + 1; // calculate how many byte can be send within a segmentSize
+            data.More = true;
+            // var secondLast = 522;
+
+            // int fileIndex = 0;  
+            // int checkWindowSize = 0;
+            // data.Sequence = 0;
+            //
+
+            // while(data.More)
+            // {
+            //     
+            //     for (int i = 0; i < chunk.Length; i++)
+            //     {
+            //         chunk[i] = new byte[data.Size]; //Calculate bytes one chunk send and make array
+            //         for (int j = 0; j < chunk[i].Length; j++) //Loops calculated chunk until it is full or ends
+            //         {
+            //             if (fileIndex < fileBytes.Length)
+            //             {
+            //                 chunk[i][j] = fileBytes[fileIndex]; //Fill chunk of window size with value fileIndex | chunk = [window size][calculated byte from the message]
+            //                 fileIndex++;
+            //             }
+            //             else
+            //             {
+            //                 data.More = false;
+            //             }
+            //         }
+            //
+            //         data.Data = chunk[i];
+            //         byte[] sendPacket = Encoding.ASCII.GetBytes(data.Sequence + "|" + Encoding.ASCII.GetString(data.Data) + "|" + data.More + "|" + data.Size);
+            //         socket.SendTo(sendPacket, remoteEP);
+            //         data.Sequence++;
+            //         c.Sequence += sendPacket.Length;
+            //         
+            //         // takes care of ACK message
+            //         checkWindowSize++;
+            //         if(checkWindowSize == receivedRequestMessage.WindowSize)
+            //         {
+            //             checkWindowSize = 0;
+            //             socket.SendTimeout = 1000;
+            //             int max = 1;
+            //             // bool confirm = true;
+            //             while(true)
+            //             {
+            //                 int x = socket.ReceiveFrom(revackMsg, SocketFlags.None, ref remoteEP);
+            //                 Console.WriteLine("Message received from {0} and the message is: {1}", req.From, Encoding.ASCII.GetString(revackMsg, 0, x));
+            //                 if(Encoding.ASCII.GetString(revackMsg, 0, x) != Messages.ACK.ToString())
+            //                 {
+            //                     int packetNumber = Int32.Parse(Encoding.ASCII.GetString(revackMsg, 0, x)) - 1;
+            //                     fileIndex = (packetNumber * data.Size) - data.Size; // 464
+            //                     data.More = true;
+            //                     break;
+            //                 }
+            //                 if(max == receivedRequestMessage.WindowSize)
+            //                 {
+            //                     break;
+            //                 }
+            //                 max++;
+            //             }
+            //         }
+            //
+            //         if(data.More == false)
+            //         {
+            //             socket.SendTo(Encoding.ASCII.GetBytes(Messages.CLOSE_REQUEST.ToString()), remoteEP);
+            //             break;
+            //         }
+            //         
+            // }
+            // }
             
             
             
