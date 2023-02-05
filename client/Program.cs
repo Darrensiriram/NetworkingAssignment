@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using UDP_FTP.Models;
+using System.Text.Json;
 using UDP_FTP.Error_Handling;
+using UDP_FTP.Models;
 using static UDP_FTP.Models.Enums;
 
 namespace Client
@@ -14,17 +16,18 @@ namespace Client
         {
             string student_1 = "Darren Siriram 0999506";
             string student_2 = "Ertugrul Karaduman 0997475";
-
-            byte[] buffer = new byte[(int)Params.BUFFER_SIZE];
-            byte[] msg = new byte[1024];
-            byte[] revMsg = new byte[1024];
-            byte[] revReqMsg = new byte[1024];
-            byte[] revackMsg = new byte[1024];
-            byte[] revcloMsg = new byte[1024];
             
-            Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            IPAddress ip = IPAddress.Parse("127.0.0.1");
-
+            List<int> LostAck = new List<int> { 3, 6 };
+            byte[] revmsg = new byte[2048];
+            byte[] buffer = new byte[2048];
+            byte[] data = new byte[2048];
+            byte[] ackb = new byte[2048];
+            byte[] close = new byte[2048];
+            Socket sock;
+            //TODO: Change the IP address to Any
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 32000); 
+            EndPoint remoteEp = new IPEndPoint(IPAddress.Any, 32000);
+            
             HelloMSG h = new HelloMSG();
             RequestMSG r = new RequestMSG();
             DataMSG D = new DataMSG();
@@ -32,101 +35,124 @@ namespace Client
             CloseMSG cls = new CloseMSG();
             ConSettings c = new ConSettings();
 
-            h.From = student_1;
-            h.To = "Server";
-            h.Type = Messages.HELLO;
-
-            r.From = student_1;
-            r.To = "Server";
-            r.FileName = "test.txt";
-            r.Type = Messages.REQUEST;
+            Console.WriteLine("Enter the window size:");
+            int windowSize = int.Parse(Console.ReadLine());
+            Console.WriteLine("Enter the segment size:");
+            int segmentSize = int.Parse(Console.ReadLine());
+            Console.WriteLine("-------------------------");
             
-            c.From = student_1;
-            c.To = "Server";
-            c.Sequence = 0; 
-
-            ack.From = student_1;
-            ack.To = "Server";
-            ack.Sequence = 1;
-            ack.Type = Messages.ACK;
+            h.From = "client1";
+            h.Type = Enums.Messages.HELLO;
+            h.To = "MyServer";
+            byte[] helloBytes = JsonSerializer.SerializeToUtf8Bytes(h);
             
-            cls.From = student_1;
-            cls.To = "Server";
-            cls.Type = Messages.CLOSE_CONFIRM;
-           
             try
             {
-                IPEndPoint endpoint = new IPEndPoint(ip, 5004);
-                EndPoint remoteEP = new IPEndPoint(ip, 5010);
-                msg = Encoding.ASCII.GetBytes(Messages.HELLO.ToString());
-                sock.SendTo(msg, endpoint);
+                Console.WriteLine("[Client] Sending hello message...");
+                sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                sock.SendTo(helloBytes, helloBytes.Length, SocketFlags.None, endPoint);
 
-                int recv = sock.ReceiveFrom(revMsg, SocketFlags.None, ref remoteEP);
-                Console.WriteLine("Messaged received from: {0} and the message is: {1}",h.From, Encoding.ASCII.GetString(revMsg,0,recv));
-                int chosenId = Int32.Parse(Encoding.ASCII.GetString(revMsg, 0, recv).Split("|")[0]);
+                sock.ReceiveFrom(buffer, ref remoteEp);
+                var utf8Reader = new Utf8JsonReader(buffer);
+                HelloMSG H = JsonSerializer.Deserialize<HelloMSG>(ref utf8Reader);
+                Console.WriteLine("[Server] Hello reply...");
+                r.From = H.To;
+                r.To = H.From;
+                r.ConID = H.ConID;
+                r.Type = Enums.Messages.REQUEST;
+                r.FileName = "test.txt";
+                r.WindowSize = windowSize;
+                r.SegmentSize = segmentSize;
 
-                h.ConID = chosenId;
-                r.ConID = chosenId;
-                D.ConID = chosenId;
-                c.ConID = chosenId;
-                ack.ConID = chosenId;
-                cls.ConID = chosenId;
+                Console.WriteLine("[Client]Sending request...");
                 
-                string req = "Type of message:" + r.Type + " & " + " File name:" + r.FileName + "& " + " Id:" + c.ConID + " Message from: " + r.From + " ,Message sending to: " + r.To ;
-                byte[] reqMSG = Encoding.ASCII.GetBytes(req);
-                sock.SendTo(reqMSG, endpoint);
+                byte[] requestByte = JsonSerializer.SerializeToUtf8Bytes(r);
+                sock.SendTo(requestByte, requestByte.Length, SocketFlags.None, endPoint);
                 
-                if (ErrorHandler.VerifyRequest(r, c) == ErrorType.NOERROR )
-                {
-                    int x = sock.ReceiveFrom(revReqMsg, SocketFlags.None, ref remoteEP);
-                    Console.WriteLine("Message received from {0} and the message is: {1}", r.From, Encoding.ASCII.GetString(revReqMsg, 0, x));
-                }
+                sock.ReceiveFrom(revmsg, ref remoteEp);
+                var utf8Reader2 = new Utf8JsonReader(revmsg);
+                RequestMSG R = JsonSerializer.Deserialize<RequestMSG>(ref utf8Reader2);
+                Console.WriteLine("[Server] Request accepted...");
                 
-                string fullText = "";
+                Console.WriteLine("[Server] Data is being send...");
+                sock.ReceiveFrom(data, ref remoteEp);
+                var utf8Reader3 = new Utf8JsonReader(data);
+                DataMSG DMSG = JsonSerializer.Deserialize<DataMSG>(ref utf8Reader3);
+
+                int count = 0;
+                string message = "";
+                message += Encoding.UTF8.GetString(DMSG.Data);
+                List<int> seqList = new List<int> { };
+
+                Console.WriteLine("[" + DMSG.Sequence + "]" + " " + DMSG.Data.Length + " bytes received | last packet: " + DMSG.More);
+                Console.WriteLine(Encoding.UTF8.GetString(DMSG.Data));
                 while(true)
                 {
+                    if (LostAck.Contains(DMSG.Sequence))
+                    {
+                        LostAck.Remove(DMSG.Sequence);
+                    }
+                    else
+                    {   
+                        ack.Type = Messages.ACK;
+                        ack.From = DMSG.To;
+                        ack.To = DMSG.From;
+                        ack.ConID = DMSG.ConID;
+                        ack.Sequence = DMSG.Sequence;
+                        ackb = JsonSerializer.SerializeToUtf8Bytes(ack);
+                        sock.SendTo(ackb, ackb.Length, SocketFlags.None, endPoint);
+                        seqList.Add(DMSG.Sequence);
+                    }
+                    count++;
+                    if (DMSG.More == false)
+                    {
+                        break;
+                    }
                     
-                    int x = sock.ReceiveFrom(revackMsg, SocketFlags.None, ref remoteEP);
-                    Console.WriteLine("Message received from {0} and the message is: {1}", r.From, Encoding.ASCII.GetString(revackMsg, 0, x));
-                    string packetNumber = Encoding.ASCII.GetString(revackMsg, 0, x).Split("|")[0];
-                    string split1 = Encoding.ASCII.GetString(revackMsg, 0, x).Split("|")[0];
-                    fullText += Encoding.ASCII.GetString(revackMsg, 0, x);
-                    ack.Sequence++;
-                    if(ErrorHandler.VerifyAck(ack, c) == ErrorType.NOERROR)
-                    {
-                        //if message correct, send correct back
-                        sock.SendTo(Encoding.ASCII.GetBytes(Messages.ACK.ToString()), remoteEP);
-                    } else {
-                        sock.SendTo(Encoding.ASCII.GetBytes(packetNumber.ToString()), remoteEP);
-                    }
+                    byte[] msg = new byte[2048];
+                    sock.ReceiveFrom(msg, ref remoteEp);
+                    var utf8Reader4 = new Utf8JsonReader(msg);
+                    DMSG = JsonSerializer.Deserialize<DataMSG>(ref utf8Reader4);
 
-                    if (ack.Sequence == (int)Params.WINDOW_SIZE)
+                    if(seqList.Contains(DMSG.Sequence))
                     {
-                      ack.Sequence = 0;
+                        continue;
                     }
-                    string boolingValue = Encoding.ASCII.GetString(revackMsg, 0, x).Split("|")[2];
-                    if(boolingValue == "False")
+                    else
                     {
-                     break;
+                        message += Encoding.UTF8.GetString(DMSG.Data);
                     }
+                    Console.WriteLine("-------------------------");
+                    Console.WriteLine("[" + DMSG.Sequence + "]" + " " + DMSG.Data.Length + " bytes received | More packets to be delivered: " + DMSG.More);
+                    Console.WriteLine(Encoding.UTF8.GetString(DMSG.Data));
+                    Console.WriteLine("-------------------------");
                 }
+                Console.WriteLine("Message: {0}", message);
 
-                int xd = sock.ReceiveFrom(revcloMsg, SocketFlags.None, ref remoteEP);
-                Console.WriteLine("Message received from {0} and the message is: {1}", r.From, Encoding.ASCII.GetString(revcloMsg, 0, xd));
-                
-                if(ErrorHandler.VerifyClose(cls, c) == ErrorType.NOERROR)
+                sock.ReceiveFrom(close, ref remoteEp);
+                var utf8Reader5 = new Utf8JsonReader(close);
+                CloseMSG CLS = JsonSerializer.Deserialize<CloseMSG>(ref utf8Reader5);
+                if (CLS.Type == Messages.CLOSE_REQUEST)
                 {
-                        sock.SendTo(Encoding.ASCII.GetBytes(Messages.CLOSE_CONFIRM.ToString()+"|"+cls.ConID), remoteEP);
-                }
-                Console.WriteLine("Message sent to broadcast address");
-            }
-            catch
-            {
-                Console.WriteLine("\n Socket Error. Terminating");
-            }
+                    Console.WriteLine("[Server] Closing connection...");
+                    cls.Type = Messages.CLOSE_CONFIRM;
+                    cls.From = CLS.To;
+                    cls.To = CLS.From;
+                    cls.ConID = CLS.ConID;
+                    byte[] closeByte = JsonSerializer.SerializeToUtf8Bytes(cls);
+                    sock.SendTo(closeByte, closeByte.Length, SocketFlags.None, endPoint);
 
+                    Environment.Exit(0);
+                }
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("Error: An exception has occurred.");
+            }
+            
             Console.WriteLine("Download Complete!");
-           
+            Console.WriteLine("Group members: {0} | {1}", student_1, student_2);
+        
         }
     }
 }

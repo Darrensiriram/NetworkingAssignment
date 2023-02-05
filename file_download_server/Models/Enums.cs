@@ -17,8 +17,6 @@ namespace UDP_FTP.Models
         public enum Params : int
         {
             BUFFER_SIZE = 1000,
-            WINDOW_SIZE = 5,
-            SEGMENT_SIZE = 10
         }
         public enum Messages : int
         {

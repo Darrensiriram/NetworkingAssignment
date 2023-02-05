@@ -15,20 +15,16 @@ namespace UDP_FTP.Error_Handling
             if ( hello.To != C.To || hello.Type != Messages.HELLO)
                 return ErrorType.BADREQUEST;
             return ErrorType.NOERROR;
-        } 
+        }
         public static ErrorType VerifyRequest( RequestMSG req, ConSettings C)
         {
-           /* Console.WriteLine(req.ConID != C.ConID );
-            Console.WriteLine(req.From != C.From );
-            Console.WriteLine(req.To != C.To );
-            Console.WriteLine(req.Type != Messages.REQUEST);*/
             if (req.ConID != C.ConID || req.From != C.From || req.To != C.To || req.Type != Messages.REQUEST)
                 return ErrorType.BADREQUEST;
             return ErrorType.NOERROR;
         }
         public static ErrorType VerifyAck( AckMSG ack, ConSettings C)
         {
-            if (ack.ConID != C.ConID || ack.From != C.From || ack.To != C.To || ack.Type != Messages.ACK || ack.Sequence < C.Sequence || ack.Sequence > C.Sequence + (int)Params.WINDOW_SIZE )
+            if (ack.ConID != C.ConID || ack.From != C.From || ack.To != C.To || ack.Type != Messages.ACK || ack.Sequence < C.Sequence || ack.Sequence > C.Sequence + C.WindowSize )
                 return ErrorType.BADREQUEST;
             return ErrorType.NOERROR;
         }
