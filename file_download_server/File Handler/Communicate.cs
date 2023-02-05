@@ -172,7 +172,6 @@ namespace UDP_FTP.File_Handler
 
                     byte[] dataBytes = JsonSerializer.SerializeToUtf8Bytes(data);
                     socket.SendTo(dataBytes, dataBytes.Length, SocketFlags.None, remoteEP);
-                    Console.WriteLine("Data sequence: " + data.Sequence + " | More: " + data.More);
                     seq++;
                     //Acknowledge
                     try{
@@ -184,8 +183,10 @@ namespace UDP_FTP.File_Handler
                             Console.WriteLine("Error: Wrong message type withing the ack phase");
                             return ErrorType.BADREQUEST;
                         }
+                        Console.WriteLine("Data sequence: " + data.Sequence + " | More: " + data.More);
                         C.Sequence = receivedAckMessage.Sequence;
                     }catch (Exception e){
+                        Console.WriteLine("Data sequence: " + data.Sequence + " | More: " + data.More + " | Not delivered");
                         seqListNotAck.Add(C.Sequence + 1);
                         continue;
                     }  

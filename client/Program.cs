@@ -25,8 +25,8 @@ namespace Client
             byte[] close = new byte[2048];
             Socket sock;
             //TODO: Change the IP address to Any
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 32000); 
-            EndPoint remoteEp = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 32000);
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 32000); 
+            EndPoint remoteEp = new IPEndPoint(IPAddress.Any, 32000);
             
             HelloMSG h = new HelloMSG();
             RequestMSG r = new RequestMSG();
@@ -86,7 +86,7 @@ namespace Client
 
                 Console.WriteLine("[" + DMSG.Sequence + "]" + " " + DMSG.Data.Length + " bytes received | last packet: " + DMSG.More);
                 Console.WriteLine(Encoding.UTF8.GetString(DMSG.Data));
-                while(DMSG.More)
+                while(true)
                 {
                     if (LostAck.Contains(DMSG.Sequence))
                     {
@@ -104,6 +104,10 @@ namespace Client
                         seqList.Add(DMSG.Sequence);
                     }
                     count++;
+                    if (DMSG.More == false)
+                    {
+                        break;
+                    }
                     
                     byte[] msg = new byte[2048];
                     sock.ReceiveFrom(msg, ref remoteEp);
@@ -119,27 +123,27 @@ namespace Client
                         message += Encoding.UTF8.GetString(DMSG.Data);
                     }
                     Console.WriteLine("-------------------------");
-                    Console.WriteLine("[" + DMSG.Sequence + "]" + " " + DMSG.Data.Length + " bytes received | last packet: " + DMSG.More);
+                    Console.WriteLine("[" + DMSG.Sequence + "]" + " " + DMSG.Data.Length + " bytes received | More packets to be delivered: " + DMSG.More);
                     Console.WriteLine(Encoding.UTF8.GetString(DMSG.Data));
                     Console.WriteLine("-------------------------");
                 }
-            Console.WriteLine("Message: {0}", message);
+                Console.WriteLine("Message: {0}", message);
 
-            sock.ReceiveFrom(close, ref remoteEp);
-            var utf8Reader5 = new Utf8JsonReader(close);
-            CloseMSG CLS = JsonSerializer.Deserialize<CloseMSG>(ref utf8Reader5);
-            if (CLS.Type == Messages.CLOSE_REQUEST)
-            {
-                Console.WriteLine("[Server] Closing connection...");
-                cls.Type = Messages.CLOSE_CONFIRM;
-                cls.From = CLS.To;
-                cls.To = CLS.From;
-                cls.ConID = CLS.ConID;
-                byte[] closeByte = JsonSerializer.SerializeToUtf8Bytes(cls);
-                sock.SendTo(closeByte, closeByte.Length, SocketFlags.None, endPoint);
+                sock.ReceiveFrom(close, ref remoteEp);
+                var utf8Reader5 = new Utf8JsonReader(close);
+                CloseMSG CLS = JsonSerializer.Deserialize<CloseMSG>(ref utf8Reader5);
+                if (CLS.Type == Messages.CLOSE_REQUEST)
+                {
+                    Console.WriteLine("[Server] Closing connection...");
+                    cls.Type = Messages.CLOSE_CONFIRM;
+                    cls.From = CLS.To;
+                    cls.To = CLS.From;
+                    cls.ConID = CLS.ConID;
+                    byte[] closeByte = JsonSerializer.SerializeToUtf8Bytes(cls);
+                    sock.SendTo(closeByte, closeByte.Length, SocketFlags.None, endPoint);
 
-                Environment.Exit(0);
-            }
+                    Environment.Exit(0);
+                }
             }
             catch (SocketException e)
             {
