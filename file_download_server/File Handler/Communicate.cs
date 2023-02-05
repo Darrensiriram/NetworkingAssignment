@@ -23,6 +23,7 @@ namespace UDP_FTP.File_Handler
         private byte[] buffer;
         byte[] msg;
         byte[] dbuffer;
+        byte[] close;
         private string file;
         ConSettings C;
 
@@ -38,6 +39,7 @@ namespace UDP_FTP.File_Handler
             msg = new byte[2048];
             buffer = new byte[2048];
             dbuffer = new byte[2048];
+            close = new byte[2048];
 
             Random id = new Random();
             SessionID = id.Next(1, 1000);
@@ -130,88 +132,95 @@ namespace UDP_FTP.File_Handler
             {
                 return ErrorType.BADREQUEST;
             }
-            
-            Console.WriteLine(receivedRequestMessage.FileName + receivedRequestMessage.Type);
            
             byte[] fileBytes = File.ReadAllBytes(filelocation); //Convert tekst file into bytes
-            byte[][] chunk = new byte[receivedRequestMessage.WindowSize][]; //prepare byte array with size of windows size
-            data.Size = fileBytes.Length / receivedRequestMessage.SegmentSize + 1; // calculate how many byte can be send within a segmentSize
+            
+            int seq = 0;
+            int index = 0;
+            List<int> seqListNotAck = new List<int> { };
             data.More = true;
-            // var secondLast = 522;
 
-            // int fileIndex = 0;  
-            // int checkWindowSize = 0;
-            // data.Sequence = 0;
-            //
+            while(data.More)
+            {
+                for (int i = 0; i < receivedRequestMessage.WindowSize; i++)
+                {
+                    if (data.More == false)
+                    {
+                        break;
+                    }
+                    //Send data
+                    data.Type = Messages.DATA;
+                    data.From = receivedRequestMessage.To;
+                    data.To = receivedRequestMessage.From;
+                    data.ConID = receivedRequestMessage.ConID;
+                    data.Size = receivedRequestMessage.SegmentSize;
+                    data.More = true;
+                    data.Sequence = seq;
+                    data.Data = new byte[data.Size];
+                    
+                    for (int j = 0; j < data.Size; j++)
+                    {
+                        if (index >= fileBytes.Length)
+                        {
+                            data.More = false;
+                            break;
+                        } else {
+                            data.Data[j] = fileBytes[index];
+                            index++;
+                        }
+                    }
 
-            // while(data.More)
-            // {
-            //     
-            //     for (int i = 0; i < chunk.Length; i++)
-            //     {
-            //         chunk[i] = new byte[data.Size]; //Calculate bytes one chunk send and make array
-            //         for (int j = 0; j < chunk[i].Length; j++) //Loops calculated chunk until it is full or ends
-            //         {
-            //             if (fileIndex < fileBytes.Length)
-            //             {
-            //                 chunk[i][j] = fileBytes[fileIndex]; //Fill chunk of window size with value fileIndex | chunk = [window size][calculated byte from the message]
-            //                 fileIndex++;
-            //             }
-            //             else
-            //             {
-            //                 data.More = false;
-            //             }
-            //         }
-            //
-            //         data.Data = chunk[i];
-            //         byte[] sendPacket = Encoding.ASCII.GetBytes(data.Sequence + "|" + Encoding.ASCII.GetString(data.Data) + "|" + data.More + "|" + data.Size);
-            //         socket.SendTo(sendPacket, remoteEP);
-            //         data.Sequence++;
-            //         c.Sequence += sendPacket.Length;
-            //         
-            //         // takes care of ACK message
-            //         checkWindowSize++;
-            //         if(checkWindowSize == receivedRequestMessage.WindowSize)
-            //         {
-            //             checkWindowSize = 0;
-            //             socket.SendTimeout = 1000;
-            //             int max = 1;
-            //             // bool confirm = true;
-            //             while(true)
-            //             {
-            //                 int x = socket.ReceiveFrom(revackMsg, SocketFlags.None, ref remoteEP);
-            //                 Console.WriteLine("Message received from {0} and the message is: {1}", req.From, Encoding.ASCII.GetString(revackMsg, 0, x));
-            //                 if(Encoding.ASCII.GetString(revackMsg, 0, x) != Messages.ACK.ToString())
-            //                 {
-            //                     int packetNumber = Int32.Parse(Encoding.ASCII.GetString(revackMsg, 0, x)) - 1;
-            //                     fileIndex = (packetNumber * data.Size) - data.Size; // 464
-            //                     data.More = true;
-            //                     break;
-            //                 }
-            //                 if(max == receivedRequestMessage.WindowSize)
-            //                 {
-            //                     break;
-            //                 }
-            //                 max++;
-            //             }
-            //         }
-            //
-            //         if(data.More == false)
-            //         {
-            //             socket.SendTo(Encoding.ASCII.GetBytes(Messages.CLOSE_REQUEST.ToString()), remoteEP);
-            //             break;
-            //         }
-            //         
-            // }
-            // }
-            
-            
-            
-            
-            
-            
+                    byte[] dataBytes = JsonSerializer.SerializeToUtf8Bytes(data);
+                    socket.SendTo(dataBytes, dataBytes.Length, SocketFlags.None, remoteEP);
+                    Console.WriteLine("Data sequence: " + data.Sequence + " | More: " + data.More);
+                    seq++;
+                    //Acknowledge
+                    try{
+                        int ackReceived = socket.ReceiveFrom(dbuffer, ref remoteEP);
+                        var utf8Reader3 = new Utf8JsonReader(dbuffer);
+                        AckMSG receivedAckMessage = JsonSerializer.Deserialize<AckMSG>(ref utf8Reader3);
+                        if (ErrorHandler.VerifyAck(receivedAckMessage, C) != ErrorType.NOERROR)
+                        {
+                            Console.WriteLine("Error: Wrong message type withing the ack phase");
+                            return ErrorType.BADREQUEST;
+                        }
+                        C.Sequence = receivedAckMessage.Sequence;
+                    }catch (Exception e){
+                        seqListNotAck.Add(C.Sequence + 1);
+                        continue;
+                    }  
 
-            return ErrorType.NOERROR;
+                }
+                Console.WriteLine("---------------end of window-----------------");
+                if(seqListNotAck.Count > 0)
+                {
+                    seq = seqListNotAck[0];
+                    seqListNotAck.Remove(seq);
+                    index = data.Size * seq;
+                    C.Sequence = seq;
+                }
+            }
+
+            cls.Type = Messages.CLOSE_REQUEST;
+            cls.From = receivedRequestMessage.To;
+            cls.To = receivedRequestMessage.From;
+            cls.ConID = receivedRequestMessage.ConID;
+            byte[] closeByte = JsonSerializer.SerializeToUtf8Bytes(cls);
+            socket.SendTo(closeByte, closeByte.Length, SocketFlags.None, remoteEP);
+            
+            socket.ReceiveFrom(close, ref remoteEP);
+            var utf8Reader5 = new Utf8JsonReader(close);
+            CloseMSG CLS = JsonSerializer.Deserialize<CloseMSG>(ref utf8Reader5);
+            if (CLS.Type == Messages.CLOSE_CONFIRM)
+            {
+                Console.WriteLine("[Server] Closing connection...");
+                return ErrorType.NOERROR;
+            }
+            else
+            {
+                Console.WriteLine("[Server] Error: Wrong message type withing the close phase");
+                return ErrorType.BADREQUEST;
+            }
         }
     }
 }

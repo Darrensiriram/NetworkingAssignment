@@ -85,6 +85,7 @@ namespace Client
                 List<int> seqList = new List<int> { };
 
                 Console.WriteLine("[" + DMSG.Sequence + "]" + " " + DMSG.Data.Length + " bytes received | last packet: " + DMSG.More);
+                Console.WriteLine(Encoding.UTF8.GetString(DMSG.Data));
                 while(DMSG.More)
                 {
                     if (LostAck.Contains(DMSG.Sequence))
@@ -117,7 +118,10 @@ namespace Client
                     {
                         message += Encoding.UTF8.GetString(DMSG.Data);
                     }
+                    Console.WriteLine("-------------------------");
                     Console.WriteLine("[" + DMSG.Sequence + "]" + " " + DMSG.Data.Length + " bytes received | last packet: " + DMSG.More);
+                    Console.WriteLine(Encoding.UTF8.GetString(DMSG.Data));
+                    Console.WriteLine("-------------------------");
                 }
             Console.WriteLine("Message: {0}", message);
 
